@@ -2,8 +2,9 @@
 
 先读这里：这个脚本**能做什么、不能做什么**
 ================================================
-`best.pt` 是一个 ultralytics 检测模型（Detect 头，9 类，imgsz=672，约 3.0M 参数）。
-针对它，本仓库工具的能力边界是**实测过**的（见 README 与 extras/yolov8_torch_pruning/）：
+脚本默认读取 `best.pt`（ultralytics 检测模型，Detect 头）。
+以作者测试用的模型为例：9 类、imgsz=672、约 3.0M 参数。
+针对这类模型，本工具的能力边界是实测过的（见 README 与 `extras/yolov8_torch_pruning/`）：
 
 * ✅ **非结构化剪枝**（本脚本默认走这条）：按重要性把单个权重置零。
   - 有效参数量真的下降，可以配掩码感知微调把精度找回来；
@@ -11,33 +12,30 @@
 * ❌ **结构化剪枝（删通道）**：本工具做不到。两个原因都是硬阻塞：
   1. ultralytics 的 `BaseModel._predict_once` 对 Proxy 做迭代，`torch.fx` 追不了；
   2. 工具把 `torch.cat` / `Upsample` 当作屏障，而 YOLOv8 的 PAN-FPN 颈部全靠这两者。
-  脚本会在第 2 步**现场验证**这一点并把原因打出来，不是我在注释里空口断言。
+  脚本会在运行时现场验证这一点并打印原因，而非仅在文档中声明。
 
-想给这个检测模型真正降 FLOPs（删通道），请用已经在本机验证可用的方案：
+若目标是降低 FLOPs（删除通道），请使用已验证可用的方案：
 `extras/yolov8_torch_pruning/reproduce.py`（torch-pruning + C2f 改造，实测 MACs -54%）。
 
 用法
 ====
-    # 环境必须装 ultralytics（本仓库的 gpupy312 没有装）
-    $py = 'C:\\Users\\GuoZhe\\.conda\\envs\\yolov8\\python.exe'
-    $env:PYTHONIOENCODING='utf-8'; $env:PYTHONUTF8='1'
+    # 需要已安装 ultralytics 的 Python 环境
+    python run.py --sparsity 0.5
 
-    # 只剪不训（快，约 1 分钟）
-    & $py run.py --sparsity 0.5
+    # 剪枝 + 评估 mAP + 掩码感知微调
+    python run.py --data <dataset.yaml> --sparsity 0.5 --finetune-epochs 3
 
-    # 剪 + 评估 mAP + 掩码感知微调（本机实测约 2~3 分钟）
-    & $py run.py --data 'E:\\ItemCodeFlies\\Dish_Recognition\\dataset.yaml' `
-                 --sparsity 0.5 --finetune-epochs 3
+    # Windows 终端若中文乱码，先设置 UTF-8
+    #   PowerShell: $env:PYTHONIOENCODING="utf-8"
+    #   bash:       export PYTHONIOENCODING=utf-8
 
-**数据集要选对**（这一点很容易踩坑）：
+**dataset.yaml 必须与权重的训练数据一致**：
 
-* `best.pt` 来自 `Dish_Recognition\\result\\yolov8n_0106DishPlate4`（MD5 一致），
-  那次训练用的 `dataset.yaml` → `E:/Dataset/251229null/Dataset`（800 训练 / 55 验证）。
-  **用它评估才代表模型的真实水平**（实测 mAP50-95 ≈ 0.975）。
-* `Dish_Recognition\\dataset\\`（5814/1454 张，2025-08-20 的 "fail" 帧）是**另一份数据**，
-  模型没在上面训练过，在那里评估只有 ≈0.17，不能用来判断模型好坏。
+* 评估与微调都会读取 `--data` 指定的 yaml；用错数据集会得到没有参考价值的 mAP。
+* 权重中的 `train_args['data']` 字段记录了训练时使用的 yaml 路径，可据此确认。
+* 同一工程内可能存在多份数据集配置，注意不要把「模型未训练过的数据」当作验证集。
 
-本机实测（`--sparsity 0.5 --finetune-epochs 3`，RTX 4060）：
+参考数据（`--sparsity 0.5 --finetune-epochs 3`，RTX 4060，私有数据集，仅作量级参考）：
 
 | 阶段 | mAP50 | mAP50-95 |
 | --- | --- | --- |
@@ -45,11 +43,11 @@
 | 剪 50% 权重后（未微调） | 0.9949 | 0.9244 |
 | 掩码感知微调 3 轮后 | 0.9950 | **0.9824** |
 
-即：50% 权重置零只掉 0.05 mAP，微调 3 轮后反超原始模型。
-但注意**稠密 FLOPs 与延迟不变**（实测约 6 ms，前后差异属测量噪声）。
+即：50% 权重置零仅损失约 0.05 mAP，微调 3 轮后略高于原始模型。
+需要注意稠密 FLOPs 与延迟不变（约 6 ms，前后差异属测量噪声）。
 
-产物写到 `runs/prune_best/`：可直接被 `YOLO(path)` 加载的权重（已微调且严格稀疏，
-重载验证 mAP50-95 = 0.9824）、掩码、以及 Markdown / JSON 报告。
+产物写到 `runs/prune_best/`：可被 `YOLO(path)` 直接加载的权重（已微调且严格稀疏）、
+掩码、以及 Markdown / JSON 报告。
 """
 
 from __future__ import annotations

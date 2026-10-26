@@ -8,7 +8,17 @@ version = "1.0.0"
 description = "PyTorch 模型剪枝工具箱：通道依赖分析、结构化/非结构化剪枝、敏感度分析、迭代剪枝与微调、评估与报告"
 readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Zhe-g"}]
 dependencies = ["torch>=2.0"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 
 [project.optional-dependencies]
 yaml = ["pyyaml>=6.0"]
@@ -17,6 +27,11 @@ dev = ["pytest>=7.0"]
 
 [project.scripts]
 prune-toolkit = "pruning_toolkit.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Zhe-g/pruning-tool"
+Repository = "https://github.com/Zhe-g/pruning-tool"
+Issues = "https://github.com/Zhe-g/pruning-tool/issues"
 
 [tool.setuptools]
 packages = ["pruning_toolkit", "pruning_toolkit.zoo"]
