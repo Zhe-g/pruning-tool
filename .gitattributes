@@ -1,0 +1,39 @@
+# ============================================================================
+# 换行符与二进制文件处理
+#
+# 仓库内统一用 LF 存储、也用 LF 检出（eol=lf），这样 Windows 与 Linux 上
+# 的同一个文件不会因为行尾差异产生整文件 diff；二进制权重显式标记，
+# 避免被当作文本做换行转换或进入文本 diff。
+# ============================================================================
+
+# 所有文本文件：入库 LF，检出 LF
+* text=auto eol=lf
+
+# 二进制：不做换行转换、不参与文本 diff
+*.pt            binary
+*.pth           binary
+*.ckpt          binary
+*.safetensors   binary
+*.onnx          binary
+*.engine        binary
+*.tflite        binary
+*.h5            binary
+*.pb            binary
+*.zip           binary
+*.gz            binary
+*.7z            binary
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.ico           binary
+
+# 这些类型明确按文本处理，保证 diff 可读
+*.py            text eol=lf
+*.md            text eol=lf
+*.json          text eol=lf
+*.yaml          text eol=lf
+*.yml           text eol=lf
+*.toml          text eol=lf
+*.txt           text eol=lf
+.gitignore      text eol=lf
+.gitattributes  text eol=lf

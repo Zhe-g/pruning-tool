@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pruning-toolkit"
+version = "1.0.0"
+description = "PyTorch 模型剪枝工具箱：通道依赖分析、结构化/非结构化剪枝、敏感度分析、迭代剪枝与微调、评估与报告"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.0"]
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6.0"]
+onnx = ["onnx>=1.14"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+prune-toolkit = "pruning_toolkit.cli:main"
+
+[tool.setuptools]
+packages = ["pruning_toolkit", "pruning_toolkit.zoo"]

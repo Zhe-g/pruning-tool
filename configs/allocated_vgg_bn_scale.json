@@ -1,0 +1,49 @@
+{
+  "model": "small_vgg",
+  "dataset": "tiny_images",
+  "dataset_kwargs": {
+    "n_samples": 1500,
+    "noise": 0.6
+  },
+  "batch_size": 64,
+  "device": "cpu",
+  "seed": 0,
+  "mode": "structured",
+  "criterion": "bn_scale",
+  "scope": "local",
+  "schedule": "cubic",
+  "rounds": 4,
+  "sparsity": 0.55,
+  "per_layer": {},
+  "exclude": [],
+  "protect_output": true,
+  "protect_first_last": false,
+  "allocate": true,
+  "alpha": 1.2,
+  "reference": 0.5,
+  "benchmark": true,
+  "verbose": true,
+  "train": {
+    "enabled": true,
+    "epochs": 8,
+    "lr": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "max_batches": null
+  },
+  "finetune": {
+    "enabled": true,
+    "epochs_per_round": 2,
+    "lr": 0.005,
+    "momentum": 0.9,
+    "weight_decay": 0.0
+  },
+  "output": {
+    "directory": "runs",
+    "tag": "allocated-vgg",
+    "write_reports": true,
+    "write_checkpoint": true,
+    "write_masks": true,
+    "export_torchscript": true
+  }
+}

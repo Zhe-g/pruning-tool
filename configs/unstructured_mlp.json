@@ -1,0 +1,49 @@
+{
+  "model": "mlp",
+  "dataset": "blobs",
+  "dataset_kwargs": {
+    "n_samples": 1500,
+    "n_classes": 3
+  },
+  "batch_size": 64,
+  "device": "cpu",
+  "seed": 0,
+  "mode": "unstructured",
+  "criterion": "l1",
+  "scope": "global",
+  "schedule": "cubic",
+  "rounds": 4,
+  "sparsity": 0.9,
+  "per_layer": {},
+  "exclude": [],
+  "protect_output": true,
+  "protect_first_last": false,
+  "allocate": false,
+  "alpha": 1.0,
+  "reference": 0.5,
+  "benchmark": true,
+  "verbose": true,
+  "train": {
+    "enabled": true,
+    "epochs": 40,
+    "lr": 0.05,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "max_batches": null
+  },
+  "finetune": {
+    "enabled": true,
+    "epochs_per_round": 15,
+    "lr": 0.02,
+    "momentum": 0.9,
+    "weight_decay": 0.0
+  },
+  "output": {
+    "directory": "runs",
+    "tag": "mlp-demo",
+    "write_reports": true,
+    "write_checkpoint": true,
+    "write_masks": true,
+    "export_torchscript": false
+  }
+}

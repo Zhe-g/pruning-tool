@@ -1,0 +1,9 @@
+# 核心依赖：本工具是 PyTorch 原生实现，只需要 torch
+torch>=2.0
+
+# 可选依赖（按需安装，缺失时相关功能会给出明确提示）
+# pyyaml>=6.0     # 使用 .yaml/.yml 配置文件时需要（默认格式是 JSON，无需它）
+# onnx>=1.14      # 使用 pruning_toolkit.export.export_onnx 时需要
+# pytest>=7.0     # 可选：测试套件用的是标准库 unittest，装了 pytest 也能跑
+
+# 说明：工具本身不依赖 numpy（内部张量计算全部走 torch）。
